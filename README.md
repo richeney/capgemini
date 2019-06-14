@@ -3,15 +3,17 @@
 ## Steps
 
 1. Install terraform (or run in Cloud Shell which has terraform pre-installed)
-1. terraform init
-1. terraform plan
-1. terraform apply -auto-approve
+1. `terraform init`
+1. `terraform plan`
+1. `terraform apply -auto-approve`
+1. Running `terraform plan` again at this point will show no planned changes. 
 1. Trigger the backup in the portal
-1. Restore in place
-    * Effectively restores to new disk names and does OS and Data Disk Swaps
-1. `terraform plan` now shows changes required to the VM resource
+1. Restore in place using the portal
+    * Effectively restores from snapshot to new timestamped disk
+    * Uses set and attach for OS and data disk swaps
+1. `terraform plan` now believes that changes are required to the VM resource
 
-## Edited output
+## Edited terraform plan output
 
 ```bash
 <snip>
@@ -29,7 +31,7 @@ Plan: 0 to add, 1 to change, 0 to destroy.
 
 ## Issue
 
-The default restore in place create the timestemped versions of the os and data disks, and then disk swaps the VM.  Declarative systems such as ARM templates, Ansible and Terraform will see these as changes and could revert the disk attachment back to the original.
+The default restore in place create the timestemped versions of the os and data disks, and then disk swaps the VM.  Declarative systems such as ARM templates, Ansible and Terraform will see these as changes and would revert the disk attachment back to the original if that terraform plan is then applied.
 
 ## Suggestion
 
@@ -40,4 +42,4 @@ Provide a toggle option / boolean argument to allow the restore in place to forc
   * may have to be a move / clone
 * restore from snapshot to the original disk name(s)
 
-Include an explanaton of the behaviour, mentioning declarative comfig management tools. Include a warning if there is a clone step and it means that the restore is slower.
+Include tooltip explanaton, mentioning declarative comfig management tools. Include a warning if there is a clone step as the restore would be slower.
